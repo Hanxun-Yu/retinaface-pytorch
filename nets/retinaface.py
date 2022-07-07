@@ -41,15 +41,18 @@ class BboxHead(nn.Module):
 #   人脸关键点预测
 #---------------------------------------------------#
 class LandmarkHead(nn.Module):
+    POINT_COUNT = 5
     def __init__(self,inchannels=512,num_anchors=2):
         super(LandmarkHead,self).__init__()
-        self.conv1x1 = nn.Conv2d(inchannels,num_anchors*10,kernel_size=(1,1),stride=1,padding=0)
+        
+        self.conv1x1 = nn.Conv2d(inchannels,num_anchors*2*LandmarkHead.POINT_COUNT,kernel_size=(1,1),stride=1,padding=0)
 
     def forward(self,x):
         out = self.conv1x1(x)
         out = out.permute(0,2,3,1).contiguous()
 
-        return out.view(out.shape[0], -1, 10)
+        # return out.view(out.shape[0], -1, 10)
+        return out.view(out.shape[0], -1, 2*LandmarkHead.POINT_COUNT)
 
 class RetinaFace(nn.Module):
     def __init__(self, cfg = None, pretrained = False, mode = 'train'):
