@@ -46,8 +46,8 @@ if __name__ == "__main__":
     #   dir_origin_path和dir_save_path仅在mode='dir_predict'时有效
     # -------------------------------------------------------------------------#
     # dir_origin_path = "img/"
-    dir_origin_path = r"X:\work\thesis\to_retinaface_dataset\test\mi10_yuhanxun_office_glass.mp4"
-    dir_save_path = r"img_out\loss_2022_07_04_15_32_04_noglass_ok\glass"
+    dir_origin_path = r"X:\work\thesis\to_retinaface_dataset\test\mi10_yuhanxun_office_noglass.mp4"
+    dir_save_path = r"img_out/loss_2022_07_07_16_12_13/noglass"
 
     if mode == "predict":
         '''

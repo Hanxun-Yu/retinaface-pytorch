@@ -28,7 +28,8 @@ if __name__ == "__main__":
     #   获得训练用的人脸标签与坐标
     # --------------------------------#
     # training_dataset_path = r'X:\work\study\retinaface_pytorch_dataset\widerface\train\label.txt'
-    training_dataset_path = r'X:\work\thesis\to_retinaface_dataset\train\label.txt'
+    # training_dataset_path = r'X:\work\thesis\to_retinaface_dataset\train\label.txt'
+    training_dataset_path = r'X:\work\thesis\to_retinaface_7point_dataset\train\label.txt'
 
     # -------------------------------#
     #   主干特征提取网络的选择

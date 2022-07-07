@@ -26,7 +26,7 @@ class Retinaface(object):
         # ---------------------------------------------------------------------#
         # "model_path"        : 'model_data/Retinaface_mobilenet0.25.pth',
         # "model_path": 'logs/loss_2022_07_04_15_32_04_noglass_ok/model/Epoch150-Total_Loss2.4860.pth',
-        "model_path": 'logs/loss_2022_07_07_11_40_31/Epoch150-Total_Loss1.9556.pth',
+        "model_path": 'logs/loss_2022_07_07_16_12_13/Epoch145-Total_Loss2.3160.pth',
         # ---------------------------------------------------------------------#
 
         #   所使用的的主干网络：mobilenet、resnet50
@@ -132,6 +132,7 @@ class Retinaface(object):
         scale_for_landmarks = [
             np.shape(image)[1], np.shape(image)[0], np.shape(image)[1], np.shape(image)[0],
             np.shape(image)[1], np.shape(image)[0], np.shape(image)[1], np.shape(image)[0],
+            np.shape(image)[1], np.shape(image)[0], np.shape(image)[1], np.shape(image)[0],
             np.shape(image)[1], np.shape(image)[0]
         ]
 
@@ -212,6 +213,8 @@ class Retinaface(object):
             cv2.circle(old_image, (b[9], b[10]), 1, (200, 200, 200), 2)
             cv2.circle(old_image, (b[11], b[12]), 1, (200, 200, 200), 2)
             cv2.circle(old_image, (b[13], b[14]), 1, (255, 50, 50), 2)
+            cv2.circle(old_image, (b[15], b[16]), 1, (200, 200, 200), 2)
+            cv2.circle(old_image, (b[17], b[18]), 1, (200, 200, 200), 2)
         return old_image
 
     def get_FPS(self, image, test_interval):

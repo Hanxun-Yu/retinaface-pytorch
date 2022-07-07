@@ -43,7 +43,7 @@ class BboxHead(nn.Module):
 #   人脸关键点预测
 # ---------------------------------------------------#
 class LandmarkHead(nn.Module):
-    POINT_COUNT = 5
+    POINT_COUNT = 7
 
     def __init__(self, inchannels=512, num_anchors=2):
         super(LandmarkHead, self).__init__()

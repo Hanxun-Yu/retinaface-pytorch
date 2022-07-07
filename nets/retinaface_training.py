@@ -79,11 +79,11 @@ def encode(matched, priors, variances):
 
 
 def encode_landm(matched, priors, variances):
-    matched = torch.reshape(matched, (matched.size(0), 5, 2))
-    priors_cx = priors[:, 0].unsqueeze(1).expand(matched.size(0), 5).unsqueeze(2)
-    priors_cy = priors[:, 1].unsqueeze(1).expand(matched.size(0), 5).unsqueeze(2)
-    priors_w = priors[:, 2].unsqueeze(1).expand(matched.size(0), 5).unsqueeze(2)
-    priors_h = priors[:, 3].unsqueeze(1).expand(matched.size(0), 5).unsqueeze(2)
+    matched = torch.reshape(matched, (matched.size(0), 7, 2))
+    priors_cx = priors[:, 0].unsqueeze(1).expand(matched.size(0), 7).unsqueeze(2)
+    priors_cy = priors[:, 1].unsqueeze(1).expand(matched.size(0), 7).unsqueeze(2)
+    priors_w = priors[:, 2].unsqueeze(1).expand(matched.size(0), 7).unsqueeze(2)
+    priors_h = priors[:, 3].unsqueeze(1).expand(matched.size(0), 7).unsqueeze(2)
     priors = torch.cat([priors_cx, priors_cy, priors_w, priors_h], dim=2)
 
     # 减去中心后除上宽高
@@ -198,14 +198,14 @@ class MultiBoxLoss(nn.Module):
         #   创建一个tensor进行处理
         # --------------------------------------------------#
         loc_t = torch.Tensor(num, num_priors, 4)
-        landm_t = torch.Tensor(num, num_priors, 10)
+        landm_t = torch.Tensor(num, num_priors, 14)
         conf_t = torch.LongTensor(num, num_priors)
 
         for idx in range(num):
             # 获得真实框与标签
             truths = targets[idx][:, :4].data
             labels = targets[idx][:, -1].data
-            landms = targets[idx][:, 4:14].data
+            landms = targets[idx][:, 4:18].data
 
             # 获得先验框
             defaults = priors.data
@@ -236,8 +236,8 @@ class MultiBoxLoss(nn.Module):
         # ------------------------------------------------------------------------#  
         pos1 = conf_t > zeros
         pos_idx1 = pos1.unsqueeze(pos1.dim()).expand_as(landm_data)
-        landm_p = landm_data[pos_idx1].view(-1, 10)
-        landm_t = landm_t[pos_idx1].view(-1, 10)
+        landm_p = landm_data[pos_idx1].view(-1, 14)
+        landm_t = landm_t[pos_idx1].view(-1, 14)
         loss_landm = F.smooth_l1_loss(landm_p, landm_t, reduction='sum')
 
         pos = conf_t != zeros
