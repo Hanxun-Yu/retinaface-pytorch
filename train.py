@@ -215,7 +215,7 @@ if __name__ == "__main__":
         #   如果不冻结训练的话，直接设置batch_size为Unfreeze_batch_size
         # -------------------------------------------------------------------#
         batch_size = Freeze_batch_size if Freeze_Train else Unfreeze_batch_size
-        print("batch_size",batch_size)
+        print("batch_size", batch_size)
 
         # -------------------------------------------------------------------#
         #   判断当前batch_size，自适应调整学习率
