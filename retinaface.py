@@ -26,7 +26,8 @@ class Retinaface(object):
         # ---------------------------------------------------------------------#
         # "model_path"        : 'model_data/Retinaface_mobilenet0.25.pth',
         # "model_path": 'logs/loss_2022_07_04_15_32_04_noglass_ok/model/Epoch150-Total_Loss2.4860.pth',
-        "model_path": 'logs/loss_2022_07_07_16_12_13/Epoch145-Total_Loss2.3160.pth',
+        # "model_path": 'logs/loss_2022_07_08_16_18_17/Epoch148-Total_Loss2.2028.pth',
+        "model_path":"",
         # ---------------------------------------------------------------------#
 
         #   所使用的的主干网络：mobilenet、resnet50
@@ -73,6 +74,7 @@ class Retinaface(object):
         self.__dict__.update(self._defaults)
         for name, value in kwargs.items():
             setattr(self, name, value)
+            
 
         # ---------------------------------------------------#
         #   不同主干网络的config信息
@@ -144,6 +146,7 @@ class Retinaface(object):
         else:
             self.anchors = Anchors(self.cfg, image_size=(im_height, im_width)).get_anchors()
 
+        boxes_conf_landms = None
         with torch.no_grad():
             # -----------------------------------------------------------#
             #   图片预处理，归一化。
@@ -179,7 +182,7 @@ class Retinaface(object):
             boxes_conf_landms = non_max_suppression(boxes_conf_landms, self.confidence)
 
             if len(boxes_conf_landms) <= 0:
-                return old_image
+                return old_image, boxes_conf_landms
 
             # ---------------------------------------------------------#
             #   如果使用了letterbox_image的话，要把灰条的部分去除掉。
@@ -208,14 +211,15 @@ class Retinaface(object):
             # ---------------------------------------------------#
             #   b[5]-b[14]为人脸关键点的坐标
             # ---------------------------------------------------#
-            cv2.circle(old_image, (b[5], b[6]), 1, (200, 200, 200), 2)
-            cv2.circle(old_image, (b[7], b[8]), 1, (200, 200, 200), 2)
-            cv2.circle(old_image, (b[9], b[10]), 1, (200, 200, 200), 2)
-            cv2.circle(old_image, (b[11], b[12]), 1, (200, 200, 200), 2)
-            cv2.circle(old_image, (b[13], b[14]), 1, (255, 50, 50), 2)
-            cv2.circle(old_image, (b[15], b[16]), 1, (200, 200, 200), 2)
-            cv2.circle(old_image, (b[17], b[18]), 1, (200, 200, 200), 2)
-        return old_image
+            cv2.circle(old_image, (b[5], b[6]), 1, (200, 200, 200), 1)
+            cv2.circle(old_image, (b[7], b[8]), 1, (200, 200, 200), 1)
+            cv2.circle(old_image, (b[9], b[10]), 1, (200, 200, 200), 1)
+            cv2.circle(old_image, (b[11], b[12]), 1, (200, 200, 200), 1)
+            cv2.circle(old_image, (b[13], b[14]), 1, (255, 50, 50), 1)
+            cv2.circle(old_image, (b[15], b[16]), 1, (200, 200, 200), 1)
+            cv2.circle(old_image, (b[17], b[18]), 1, (200, 200, 200), 1)
+
+        return old_image, boxes_conf_landms
 
     def get_FPS(self, image, test_interval):
         # ---------------------------------------------------#

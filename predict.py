@@ -8,9 +8,33 @@ import cv2
 import numpy as np
 
 from retinaface import Retinaface
+from utils.file_helper import FileHelper
+
+
+def getLandmark(boxes_conf_landms):
+    """
+    boxes_conf_landms
+    0-3 bbox
+    4 conf
+    5-18  landmark 7
+    """
+    ret = []
+    # 一张图一般有2个眼睛
+    for landmark_item in boxes_conf_landms:
+        ret.append(landmark_item[5:])
+
+    return ret
+
+
+def getPointO(landmarks):
+    ret = []
+    for landmark_item in landmarks:
+        ret.append(landmark_item[8:10])
+    return ret
+
 
 if __name__ == "__main__":
-    retinaface = Retinaface()
+    retinaface = Retinaface(model_path='logs/loss_2022_07_08_16_18_17/Epoch148-Total_Loss2.2028.pth')
     # ----------------------------------------------------------------------------------------------------------#
     #   mode用于指定测试的模式：
     #   'predict'表示单张图片预测，如果想对预测过程进行修改，如保存图片，截取对象等，可以先看下方详细的注释
@@ -19,8 +43,8 @@ if __name__ == "__main__":
     #   'dir_predict'表示遍历文件夹进行检测并保存。默认遍历img文件夹，保存img_out文件夹，详情查看下方注释。
     # ----------------------------------------------------------------------------------------------------------#
     # mode = "predict"
-    mode = "video"
-    # mode = "dir_predict"
+    # mode = "video"
+    mode = "dir_predict"
     # ----------------------------------------------------------------------------------------------------------#
     #   video_path用于指定视频的路径，当video_path=0时表示检测摄像头
     #   想要检测视频，则设置如video_path = "xxx.mp4"即可，代表读取出根目录下的xxx.mp4文件。
@@ -46,8 +70,8 @@ if __name__ == "__main__":
     #   dir_origin_path和dir_save_path仅在mode='dir_predict'时有效
     # -------------------------------------------------------------------------#
     # dir_origin_path = "img/"
-    dir_origin_path = r"X:\work\thesis\to_retinaface_dataset\test\mi10_yuhanxun_office_noglass.mp4"
-    dir_save_path = r"img_out/loss_2022_07_07_16_12_13/noglass"
+    dir_origin_path = r"X:\work\thesis\to_retinaface_7point_dataset\test\logiC920pro_screentop_office_light_glass.mp4"
+    dir_save_path = r"img_out/loss_2022_07_08_16_18_17/glass2"
 
     if mode == "predict":
         '''
@@ -66,7 +90,7 @@ if __name__ == "__main__":
                 continue
             else:
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                r_image = retinaface.detect_image(image)
+                r_image, _ = retinaface.detect_image(image)
                 r_image = cv2.cvtColor(r_image, cv2.COLOR_RGB2BGR)
                 cv2.imshow("after", r_image)
                 cv2.waitKey(0)
@@ -100,7 +124,8 @@ if __name__ == "__main__":
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             # frame = cv2.resize(frame,(200,200))
             # 进行检测
-            frame = np.array(retinaface.detect_image(frame))
+            frame, _ = retinaface.detect_image(frame)
+            frame = np.array(frame)
             # RGBtoBGR满足opencv显示格式
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
@@ -140,10 +165,33 @@ if __name__ == "__main__":
                 image_path = os.path.join(dir_origin_path, img_name)
                 image = cv2.imread(image_path)
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                r_image = retinaface.detect_image(image)
+                r_image, boxes_conf_landms = retinaface.detect_image(image)
                 r_image = cv2.cvtColor(r_image, cv2.COLOR_RGB2BGR)
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
+
                 cv2.imwrite(os.path.join(dir_save_path, img_name), r_image)
+
+                # 输出o点位置，用于统计准确率
+                landmarks = getLandmark(boxes_conf_landms)
+                pointO_list = getPointO(landmarks)
+
+                point0str = ''
+
+                # 若列表顺序 非 左眼 右眼，则翻转
+                # 若2眼都检测出，才保存结果
+                if len(pointO_list) > 1:
+                    if pointO_list[0][0] > pointO_list[1][0]:
+                        pointO_list.reverse()
+                        print("reverse", img_name)
+
+                    for point in pointO_list:
+                        point0str += str(point[0])
+                        point0str += " "
+                        point0str += str(point[1])
+                        point0str += " "
+    
+                    resultPath = os.path.join(dir_save_path, FileHelper.get_filename(image_path, False) + ".txt")
+                    FileHelper.write_file(resultPath, point0str)
     else:
         raise AssertionError("Please specify the correct mode: 'predict', 'video', 'fps' or 'dir_predict'.")
